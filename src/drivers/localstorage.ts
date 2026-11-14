@@ -82,7 +82,13 @@ const driver: DriverFactory<LocalStorageOptions, Storage> = (opts = {}) => {
       }
       _storageListener = (ev: StorageEvent) => {
         if (ev.key) {
-          callback(ev.newValue ? "update" : "remove", ev.key);
+          if (base) {
+            if (ev.key.startsWith(`${base}:`)) {
+              callback(ev.newValue ? "update" : "remove", ev.key.slice(base.length + 1));
+            }
+          } else {
+            callback(ev.newValue ? "update" : "remove", ev.key);
+          }
         }
       };
       opts.window.addEventListener("storage", _storageListener);
